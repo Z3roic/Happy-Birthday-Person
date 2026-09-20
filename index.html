@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAPPY BIRTHDAY PERSON!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@700;800;900&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: white;
+    font-family: "Figtree", sans-serif;
+}
+
+.title {
+    position: fixed;
+    top: 25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #111;
+    font-size: clamp(36px, 6vw, 76px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.dancer {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+}
+
+.confetti {
+    position: absolute;
+    top: -30px;
+    width: 8px;
+    height: 15px;
+    animation: fall linear infinite;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    from {
+        transform: translateY(-30px) rotate(0deg);
+    }
+
+    to {
+        transform: translateY(110vh) rotate(720deg);
+    }
+}
+
+@media (max-width: 600px) {
+    .title {
+        top: 18px;
+        font-size: 34px;
+        padding: 0 10px;
+    }
+
+    .dancer {
+        width: 105px;
+        height: 105px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="title">HAPPY BIRTHDAY PERSON!</div>
+
+<div id="confetti"></div>
+
+<img class="dancer" alt="">
+<img class="dancer" alt="">
+<img class="dancer" alt="">
+
+<script>
+const imageUrl =
+"https://cdn.discordapp.com/attachments/1496551961275928609/1551094868162515005/Untitled76_20260915210745.png?ex=6ab0b92a&is=6aaf67aa&hm=3bcecfcf84f324f8f0d1e7e5f4cbd94d25a784ae08c7cda9a1c19fe540d1ccca&animated=true";
+
+const dancers = document.querySelectorAll(".dancer");
+
+const objects = [];
+
+dancers.forEach((image, index) => {
+    image.src = imageUrl;
+
+    objects.push({
+        element: image,
+        x: Math.random() * (window.innerWidth - 160),
+        y: 130 + Math.random() * (window.innerHeight - 300),
+        vx: (index === 1 ? -1 : 1) * (3 + Math.random() * 1.5),
+        vy: (index === 2 ? -1 : 1) * (3 + Math.random() * 1.5),
+        rotation: Math.random() * 360,
+        tilt: 0
+    });
+});
+
+function animate() {
+    objects.forEach(object => {
+        const element = object.element;
+
+        const width = element.offsetWidth;
+        const height = element.offsetHeight;
+
+        const minY = 115;
+        const maxX = window.innerWidth - width;
+        const maxY = window.innerHeight - height;
+
+        object.x += object.vx;
+        object.y += object.vy;
+
+        let bounced = false;
+
+        if (object.x <= 0) {
+            object.x = 0;
+            object.vx = Math.abs(object.vx);
+            bounced = true;
+        }
+
+        if (object.x >= maxX) {
+            object.x = maxX;
+            object.vx = -Math.abs(object.vx);
+            bounced = true;
+        }
+
+        if (object.y <= minY) {
+            object.y = minY;
+            object.vy = Math.abs(object.vy);
+            bounced = true;
+        }
+
+        if (object.y >= maxY) {
+            object.y = maxY;
+            object.vy = -Math.abs(object.vy);
+            bounced = true;
+        }
+
+        if (bounced) {
+            object.tilt = object.vx > 0 ? 12 : -12;
+        }
+
+        object.tilt *= 0.88;
+
+        object.rotation += object.vx * 0.15;
+
+        element.style.transform =
+            `translate(${object.x}px, ${object.y}px) rotate(${object.rotation + object.tilt}deg)`;
+    });
+
+    requestAnimationFrame(animate);
+}
+
+const confetti = document.getElementById("confetti");
+
+const colors = [
+    "#ff4d6d",
+    "#ffd166",
+    "#06d6a0",
+    "#118ab2",
+    "#8338ec",
+    "#ff8fab",
+    "#ff9f1c"
+];
+
+for (let i = 0; i < 100; i++) {
+    const piece = document.createElement("div");
+
+    piece.className = "confetti";
+
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background =
+        colors[Math.floor(Math.random() * colors.length)];
+
+    piece.style.width = 5 + Math.random() * 7 + "px";
+    piece.style.height = 8 + Math.random() * 10 + "px";
+
+    piece.style.animationDuration =
+        2.5 + Math.random() * 4 + "s";
+
+    piece.style.animationDelay =
+        Math.random() * 5 + "s";
+
+    confetti.appendChild(piece);
+}
+
+window.addEventListener("resize", () => {
+    objects.forEach(object => {
+        object.x = Math.min(
+            object.x,
+            Math.max(0, window.innerWidth - object.element.offsetWidth)
+        );
+
+        object.y = Math.min(
+            object.y,
+            Math.max(115, window.innerHeight - object.element.offsetHeight)
+        );
+    });
+});
+
+animate();
+</script>
+
+</body>
+</html>
